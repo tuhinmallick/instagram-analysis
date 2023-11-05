@@ -29,7 +29,7 @@ def get_best(tag, topn):
     s = requests.get(url)
     soup = BeautifulSoup(s.content)
     tags = soup.find("div", {"class": "tag-box tag-box-v3 margin-bottom-40"}).text.split()[:topn]
-    tags = [tag for tag in tags]
+    tags = list(tags)
     return tags
 
 def load_data():
@@ -55,7 +55,7 @@ for i in range(num_tags):
 
 if st.sidebar.button("Create Hashtags"):
     tab_names = ["all"]
-    tab_names = tab_names+[tags[i] for i in range(num_tags)]
+    tab_names += [tags[i] for i in range(num_tags)]
     tag_tabs = st.tabs(tab_names)
     all_hashtags = []
     hashtag_data = []
@@ -69,10 +69,10 @@ if st.sidebar.button("Create Hashtags"):
                 data["hashtag_data"][hashtag] = hashtag_count
             hashtag_data.append((f"{hashtag}<br>{hashtag_count:,}", hashtag_count))
 
-     
+
         tag_tabs[i+1].text_area(f"Tags for {tags[i]}", " ".join(hashtags))
         all_hashtags = all_hashtags+hashtags
-  
+
     tag_tabs[0].text_area("All Hashtags", " ".join(all_hashtags))
 
     st.header("Hashtag Count Data")
@@ -81,6 +81,6 @@ if st.sidebar.button("Create Hashtags"):
 
     with open("database.json", "w") as f:
         json.dump(data, f, indent=4)
-    
+
     fig = px.bar(df, x='hashtag', y='count')
     st.plotly_chart(fig, use_container_width=True)
